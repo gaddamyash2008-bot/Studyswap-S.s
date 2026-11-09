@@ -1,28 +1,37 @@
 const fs = require('fs');
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
 const { Pool } = require('pg');
 
-const dbFile = path.join(__dirname, '..', 'data', 'studyswap.db');
-const dbDir = path.dirname(dbFile);
-if (!fs.existsSync(dbDir)) {
-  fs.mkdirSync(dbDir, { recursive: true });
-}
-
 const isPostgres = Boolean(process.env.DATABASE_URL);
-const sqliteDb = new sqlite3.Database(dbFile);
 const pgPool = isPostgres ? new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : undefined,
 }) : null;
+
+let sqliteDb;
+let initializationPromise;
+
+function getSqliteDb() {
+  if (!sqliteDb) {
+    const sqlite3 = require('sqlite3').verbose();
+    const dbFile = path.join(__dirname, '..', 'data', 'studyswap.db');
+    const dbDir = path.dirname(dbFile);
+    if (!fs.existsSync(dbDir)) {
+      fs.mkdirSync(dbDir, { recursive: true });
+    }
+    sqliteDb = new sqlite3.Database(dbFile);
+  }
+  return sqliteDb;
+}
 
 function getDbType() {
   return isPostgres ? 'postgres' : 'sqlite';
 }
 
 function runSqlite(sql, params = []) {
+  const db = getSqliteDb();
   return new Promise((resolve, reject) => {
-    sqliteDb.run(sql, params, function onRun(err) {
+    db.run(sql, params, function onRun(err) {
       if (err) {
         reject(err);
         return;
@@ -33,8 +42,9 @@ function runSqlite(sql, params = []) {
 }
 
 async function querySqlite(sql, params = []) {
+  const db = getSqliteDb();
   return new Promise((resolve, reject) => {
-    sqliteDb.all(sql, params, (err, rows) => {
+    db.all(sql, params, (err, rows) => {
       if (err) {
         reject(err);
         return;
@@ -50,8 +60,14 @@ async function queryOneSqlite(sql, params = []) {
 }
 
 async function runPostgres(sql, params = []) {
-  const res = await pgPool.query(sql, params);
+  const pgSql = toPostgresSql(sql);
+  const res = await pgPool.query(pgSql, params);
   return res;
+}
+
+function toPostgresSql(sql) {
+  let parameterIndex = 0;
+  return sql.replace(/\?/g, () => `$${++parameterIndex}`);
 }
 
 async function query(sql, params = []) {
@@ -78,7 +94,7 @@ async function run(sql, params = []) {
 }
 
 function makeCreateTableStatements() {
-  return [
+  const statements = [
     `CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       full_name TEXT NOT NULL,
@@ -262,9 +278,13 @@ function makeCreateTableStatements() {
       FOREIGN KEY (user_id) REFERENCES users(id)
     )`
   ];
+
+  return isPostgres
+    ? statements.map((statement) => statement.replace(/INTEGER PRIMARY KEY AUTOINCREMENT/g, 'SERIAL PRIMARY KEY'))
+    : statements;
 }
 
-async function initializeDatabase() {
+async function initializeDatabaseOnce() {
   if (isPostgres) {
     for (const statement of makeCreateTableStatements()) {
       await runPostgres(statement, []);
@@ -276,24 +296,25 @@ async function initializeDatabase() {
     return;
   }
 
+  const db = getSqliteDb();
   await new Promise((resolve, reject) => {
-    sqliteDb.serialize(() => {
+    db.serialize(() => {
       makeCreateTableStatements().forEach((statement) => {
-        sqliteDb.run(statement, (err) => {
+        db.run(statement, (err) => {
           if (err) {
             reject(err);
           }
         });
       });
 
-      sqliteDb.get('SELECT id FROM pricing_settings LIMIT 1', (err, row) => {
+      db.get('SELECT id FROM pricing_settings LIMIT 1', (err, row) => {
         if (err) {
           reject(err);
           return;
         }
 
         if (!row) {
-          sqliteDb.run(`INSERT INTO pricing_settings (annual_rate, condition_like_new, condition_good, condition_fair, condition_poor, min_market_matches, market_weight, math_weight, recency_days) VALUES (0.1500, 1.00, 0.90, 0.75, 0.55, 2, 0.60, 0.40, 365)`);
+          db.run(`INSERT INTO pricing_settings (annual_rate, condition_like_new, condition_good, condition_fair, condition_poor, min_market_matches, market_weight, math_weight, recency_days) VALUES (0.1500, 1.00, 0.90, 0.75, 0.55, 2, 0.60, 0.40, 365)`);
         }
 
         resolve();
@@ -302,12 +323,22 @@ async function initializeDatabase() {
   });
 }
 
+function initializeDatabase() {
+  if (!initializationPromise) {
+    initializationPromise = initializeDatabaseOnce().catch((error) => {
+      initializationPromise = null;
+      throw error;
+    });
+  }
+  return initializationPromise;
+}
+
 module.exports = {
   initializeDatabase,
   query,
   queryOne,
   run,
   getDbType,
-  sqliteDb,
   pgPool,
+  toPostgresSql,
 };

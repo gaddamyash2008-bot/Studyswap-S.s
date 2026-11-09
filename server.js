@@ -7,7 +7,7 @@ const morgan = require('morgan');
 
 dotenv.config();
 
-const { initializeDatabase } = require('./backend/config/db');
+const { initializeDatabase, getDbType, pgPool } = require('./backend/config/db');
 const authRouter = require('./backend/routes/auth');
 const booksRouter = require('./backend/routes/books');
 const dashboardRouter = require('./backend/routes/dashboard');
@@ -15,7 +15,10 @@ const pricingRouter = require('./backend/routes/pricing');
 
 const app = express();
 const port = Number(process.env.PORT || 3000);
+const isPostgres = getDbType() === 'postgres';
+const PgSession = isPostgres ? require('connect-pg-simple')(session) : null;
 
+app.set('trust proxy', 1);
 app.use(cors({
   origin: true,
   credentials: true,
@@ -24,14 +27,37 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 
+app.use(async (req, res, next) => {
+  try {
+    if (process.env.VERCEL && (!process.env.DATABASE_URL || !process.env.SESSION_SECRET)) {
+      return res.status(503).json({
+        message: 'Set DATABASE_URL and SESSION_SECRET in the Vercel project environment variables.',
+      });
+    }
+
+    await initializeDatabase();
+    return next();
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    return res.status(503).json({ message: 'The application database is unavailable.' });
+  }
+});
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'study-swap-secret-key',
   resave: false,
   saveUninitialized: false,
+  ...(PgSession ? {
+    store: new PgSession({
+      pool: pgPool,
+      tableName: 'studyswap_sessions',
+      createTableIfMissing: true,
+    }),
+  } : {}),
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
-    secure: false,
+    secure: process.env.NODE_ENV === 'production',
     maxAge: 1000 * 60 * 60 * 24,
   },
 }));
@@ -42,7 +68,9 @@ app.use('/api/dashboard', dashboardRouter);
 app.use('/api/pricing', pricingRouter);
 
 app.use('/uploads', express.static(path.join(__dirname, 'backend', 'uploads')));
-app.use(express.static(path.join(__dirname, 'public')));
+if (!process.env.VERCEL) {
+  app.use(express.static(path.join(__dirname, 'public')));
+}
 
 app.get('/api/health', (req, res) => {
   return res.status(200).json({
@@ -72,4 +100,8 @@ async function startServer() {
   }
 }
 
-startServer();
+if (require.main === module) {
+  startServer();
+}
+
+module.exports = app;
