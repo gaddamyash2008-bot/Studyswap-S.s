@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StudySwap | Buy, sell & exchange academic books</title>
+    <meta
+      name="description"
+      content="StudySwap helps students buy, sell and exchange competitive exam and academic books affordably."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/css/style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="container nav-shell">
+        <div class="brand-wrap">
+          <div class="brand-mark">S</div>
+          <div>
+            <div class="brand-name">StudySwap</div>
+            <div class="brand-tag">Student book marketplace</div>
+          </div>
+        </div>
+
+        <nav class="main-nav">
+          <a href="#books">Books</a>
+          <a href="#how-it-works">How it works</a>
+          <a href="#pricing">AI pricing</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+
+        <div class="nav-actions">
+          <button type="button" id="showLoginBtn" class="btn btn-ghost">Log in</button>
+          <button type="button" id="showRegisterBtn" class="btn btn-primary">Get started</button>
+          <button type="button" id="logoutBtn" class="btn btn-ghost hidden">Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero container">
+        <div class="hero-copy">
+          <span class="eyebrow">Sustainable learning, smarter resale</span>
+          <h1>Give Your Books a Second Life.</h1>
+          <p>
+            Buy, sell and exchange academic books at affordable prices. Help another student learn while getting more value from your unused books.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#books" class="btn btn-primary">Explore Books</a>
+            <button type="button" id="sellActionBtn" class="btn btn-secondary">Sell Your Books</button>
+            <button type="button" id="requestBookBtn" class="btn btn-ghost">Request a Book</button>
+          </div>
+
+          <div class="hero-search">
+            <input id="landingSearch" type="text" placeholder="Search by title, author or subject" />
+            <button id="searchBooksBtn" class="btn btn-primary">Search</button>
+          </div>
+        </div>
+
+        <div class="hero-panel">
+          <div class="panel-card highlighted">
+            <div class="stat-row">
+              <span>Reused books</span>
+              <strong id="reusedCount">0</strong>
+            </div>
+            <div class="stat-row">
+              <span>Active sellers</span>
+              <strong id="sellerCount">0</strong>
+            </div>
+            <div class="stat-row">
+              <span>Average savings</span>
+              <strong id="savingCount">₹0</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container auth-panel hidden" id="authPanel">
+        <div class="auth-shell">
+          <div class="auth-intro">
+            <span class="eyebrow">Join StudySwap</span>
+            <h2>Continue as Buyer or Seller</h2>
+            <div class="role-toggle">
+              <button data-role="buyer" class="role-btn active">Buyer</button>
+              <button data-role="seller" class="role-btn">Seller</button>
+            </div>
+          </div>
+
+          <div class="auth-forms">
+            <form id="loginForm" class="auth-form active">
+              <h3>Log in</h3>
+              <label>
+                Email
+                <input type="email" name="email" placeholder="you@example.com" required />
+              </label>
+              <label>
+                Password
+                <input type="password" name="password" placeholder="Your password" required />
+              </label>
+              <button class="btn btn-primary full-width" type="submit">Login</button>
+              <button id="forgotPasswordBtn" type="button" class="text-link">Forgot password?</button>
+            </form>
+
+            <form id="registerForm" class="auth-form">
+              <h3>Create account</h3>
+              <div class="form-grid two-columns">
+                <label>
+                  Full name
+                  <input type="text" name="fullName" placeholder="Enter your name" required />
+                </label>
+                <label>
+                  Role
+                  <select name="role">
+                    <option value="buyer">Buyer</option>
+                    <option value="seller">Seller</option>
+                  </select>
+                </label>
+                <label>
+                  Email
+                  <input type="email" name="email" placeholder="you@example.com" required />
+                </label>
+                <label>
+                  City
+                  <input type="text" name="city" placeholder="Your city" />
+                </label>
+                <label>
+                  State
+                  <input type="text" name="state" placeholder="State" />
+                </label>
+                <label>
+                  Area / locality
+                  <input type="text" name="area" placeholder="Locality" />
+                </label>
+                <label>
+                  PIN code
+                  <input type="text" name="pinCode" placeholder="PIN code" />
+                </label>
+                <label>
+                  Password
+                  <input type="password" name="password" placeholder="Choose a password" required />
+                </label>
+                <label>
+                  Confirm password
+                  <input type="password" name="confirmPassword" placeholder="Confirm password" required />
+                </label>
+              </div>
+              <button class="btn btn-primary full-width" type="submit">Register</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section class="container section-spacing" id="how-it-works">
+        <div class="section-head">
+          <span class="eyebrow">How StudySwap works</span>
+          <h2>Simple, affordable and student-first</h2>
+        </div>
+
+        <div class="three-card-grid">
+          <article class="info-card">
+            <div class="icon-circle">1</div>
+            <h3>List or request</h3>
+            <p>Sellers upload books and buyers request the titles they need.</p>
+          </article>
+          <article class="info-card">
+            <div class="icon-circle">2</div>
+            <h3>Compare and bargain</h3>
+            <p>Review condition, price, edition and nearby offers before buying.</p>
+          </article>
+          <article class="info-card">
+            <div class="icon-circle">3</div>
+            <h3>Complete the exchange</h3>
+            <p>Secure negotiation, clear contact, and genuine savings for both sides.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="container section-spacing">
+        <div class="section-head">
+          <span class="eyebrow">Browse by category</span>
+          <h2>Popular academic areas</h2>
+        </div>
+        <div class="chip-list" id="categoryTabs">
+          <button class="chip active" data-category="all">All</button>
+          <button class="chip" data-category="Engineering">Engineering</button>
+          <button class="chip" data-category="Medical">Medical</button>
+          <button class="chip" data-category="IIT-JEE">IIT-JEE</button>
+          <button class="chip" data-category="NEET">NEET</button>
+          <button class="chip" data-category="UPSC">UPSC</button>
+          <button class="chip" data-category="CAT">CAT</button>
+          <button class="chip" data-category="Management">Management</button>
+          <button class="chip" data-category="General Academic">General Academic</button>
+        </div>
+      </section>
+
+      <section class="container section-spacing" id="books">
+        <div class="section-head">
+          <span class="eyebrow">Available books</span>
+          <h2>Fresh listings from real students</h2>
+        </div>
+        <div id="bookGrid" class="book-grid"></div>
+      </section>
+
+      <section id="pricing" class="container section-spacing pricing-section">
+        <div class="section-head">
+          <span class="eyebrow">AI price recommendation</span>
+          <h2>Transparent, market-aware pricing guidance</h2>
+        </div>
+
+        <div class="pricing-shell">
+          <div class="pricing-card">
+            <h3>How it works</h3>
+            <ul>
+              <li>Mathematical depreciation baseline</li>
+              <li>Comparable completed-exchange evidence</li>
+              <li>Hybrid recommendation with honest fallback</li>
+            </ul>
+          </div>
+
+          <div class="pricing-card alt">
+            <h3>Try the pricing assistant</h3>
+            <form id="pricingForm">
+              <label>
+                Original price
+                <input type="number" name="originalPrice" min="1" value="2000" required />
+              </label>
+              <label>
+                Age in years
+                <input type="number" name="ageYears" min="0" value="2" required />
+              </label>
+              <label>
+                Book condition
+                <select name="condition">
+                  <option value="Like New">Like New</option>
+                  <option value="Good" selected>Good</option>
+                  <option value="Fair">Fair</option>
+                  <option value="Poor">Poor</option>
+                </select>
+              </label>
+              <button type="submit" class="btn btn-primary">Calculate recommendation</button>
+            </form>
+            <div id="pricingResult" class="pricing-result empty">Your recommendation will appear here.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container section-spacing request-section">
+        <div class="request-card">
+          <div>
+            <span class="eyebrow">Need a specific book?</span>
+            <h2>Request a book and let sellers match your needs.</h2>
+          </div>
+          <button type="button" id="requestBookModalBtn" class="btn btn-primary">Request a Book</button>
+        </div>
+      </section>
+
+      <section class="container section-spacing sustainability-section">
+        <div class="section-head">
+          <span class="eyebrow">Sustainability at scale</span>
+          <h2>Student reuse, less waste, more impact</h2>
+        </div>
+        <div class="sustainability-grid">
+          <article class="impact-card">
+            <strong id="completedExchangesMetric">0</strong>
+            <span>Completed exchanges</span>
+          </article>
+          <article class="impact-card">
+            <strong id="buyerSavingsMetric">₹0</strong>
+            <span>Buyer savings</span>
+          </article>
+          <article class="impact-card">
+            <strong id="sellerEarningsMetric">₹0</strong>
+            <span>Seller earnings</span>
+          </article>
+        </div>
+      </section>
+
+      <section class="container section-spacing benefits-section">
+        <div class="section-head">
+          <span class="eyebrow">Why students choose StudySwap</span>
+          <h2>Built for affordability and trust</h2>
+        </div>
+        <div class="three-card-grid">
+          <article class="info-card">
+            <h3>Budget-friendly</h3>
+            <p>Buy second-hand books at discounted rates and compare value before paying.</p>
+          </article>
+          <article class="info-card">
+            <h3>Location-aware</h3>
+            <p>Search nearby localities, cities and PIN codes without exposing private addresses.</p>
+          </article>
+          <article class="info-card">
+            <h3>Better reuse</h3>
+            <p>Keep useful academic materials circulating across students and campuses.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="container section-spacing premium-section">
+        <div class="section-head">
+          <span class="eyebrow">Premium features</span>
+          <h2>Designed to support serious academic buying</h2>
+        </div>
+        <div class="three-card-grid">
+          <article class="info-card">
+            <h3>Featured listings</h3>
+            <p>Highlight timely, in-demand academic books for faster discovery.</p>
+          </article>
+          <article class="info-card">
+            <h3>Priority matching</h3>
+            <p>Promptly connect requested titles with available listings and local sellers.</p>
+          </article>
+          <article class="info-card">
+            <h3>Smart price support</h3>
+            <p>Use transparent price guidance and actual evidence before finalizing offers.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="container section-spacing faq-section" id="faq">
+        <div class="section-head">
+          <span class="eyebrow">Frequently asked questions</span>
+          <h2>Everything students need to know</h2>
+        </div>
+
+        <div class="faq-list">
+          <details open>
+            <summary>How do I list a book?</summary>
+            <p>Register as a seller, upload the book details, add condition and expected price, and share images.</p>
+          </details>
+          <details>
+            <summary>Do I need to share my exact address?</summary>
+            <p>No. Sellers can display city, locality and PIN code without revealing home addresses.</p>
+          </details>
+          <details>
+            <summary>Can I request an unavailable book?</summary>
+            <p>Yes. Buyers can submit book requests and sellers can match them with future supply.</p>
+          </details>
+          <details>
+            <summary>Is the pricing result guaranteed?</summary>
+            <p>No. It is a transparent recommendation based on known depreciation and comparable exchange evidence.</p>
+          </details>
+        </div>
+      </section>
+
+      <section class="container section-spacing dashboard-shell hidden" id="dashboardShell">
+        <div id="buyerDashboard" class="dashboard-panel hidden"></div>
+        <div id="sellerDashboard" class="dashboard-panel hidden"></div>
+        <div id="adminDashboard" class="dashboard-panel hidden"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-inner">
+        <div>
+          <div class="brand-name">StudySwap</div>
+          <p>Second-hand academic books for smarter student living.</p>
+        </div>
+        <div class="footer-links">
+          <a href="#books">Books</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </div>
+    </footer>
+
+    <div id="toast" class="toast hidden"></div>
+
+    <div id="requestModal" class="modal hidden" aria-modal="true" role="dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Request a Book</h3>
+          <button type="button" class="close-btn" data-close-modal="requestModal">×</button>
+        </div>
+        <form id="requestBookForm">
+          <label>
+            Book title
+            <input type="text" name="title" placeholder="e.g. JEE Advanced Physics" required />
+          </label>
+          <label>
+            Author
+            <input type="text" name="author" placeholder="Author" />
+          </label>
+          <label>
+            Category
+            <select name="category">
+              <option value="Engineering">Engineering</option>
+              <option value="Medical">Medical</option>
+              <option value="IIT-JEE">IIT-JEE</option>
+              <option value="NEET">NEET</option>
+              <option value="UPSC">UPSC</option>
+              <option value="CAT">CAT</option>
+              <option value="Management">Management</option>
+              <option value="General Academic">General Academic</option>
+            </select>
+          </label>
+          <label>
+            Maximum budget
+            <input type="number" name="maxBudget" min="0" step="0.01" placeholder="1500" />
+          </label>
+          <label>
+            Preferred city
+            <input type="text" name="city" placeholder="Bengaluru" />
+          </label>
+          <label>
+            Area / locality
+            <input type="text" name="area" placeholder="Koramangala" />
+          </label>
+          <label>
+            Notes
+            <textarea name="notes" rows="3" placeholder="Tell sellers what condition or edition you need."></textarea>
+          </label>
+          <button type="submit" class="btn btn-primary full-width">Submit request</button>
+        </form>
+      </div>
+    </div>
+
+    <div id="bookDetailModal" class="modal hidden" aria-modal="true" role="dialog">
+      <div class="modal-content wide">
+        <div class="modal-header">
+          <h3>Book details</h3>
+          <button type="button" class="close-btn" data-close-modal="bookDetailModal">×</button>
+        </div>
+        <div id="bookDetailContent"></div>
+      </div>
+    </div>
+
+    <script src="./assets/js/app.js"></script>
+  </body>
+</html>

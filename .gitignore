@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+!.env.example
+cookies.txt
+req-cookie.txt
+backend/uploads/*
+!backend/uploads/.gitkeep
+backend/data/*.db
+npm-debug.log*
+.DS_Store
